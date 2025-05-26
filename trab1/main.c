@@ -19,12 +19,10 @@ typedef struct {
 
 void cluster_destroy(cluster_t *clusters_array, int num_clusters) {
     for (int i = 0; i < num_clusters; i++) {
-        for (int j = 0; j < clusters_array[i].tamanho; j++) {
-            free(clusters_array[i].ids[j]);
-        }
-        free(clusters_array[i].ids);
+        // Não libera clusters_array[i].ids[j] porque são ponteiros do ponto_t
+        free(clusters_array[i].ids); // libera só o vetor de ponteiros
     }
-    free(clusters_array);
+    free(clusters_array); // libera o array de clusters
 }
 
 int cmp_clusters(const void *a, const void *b) {
@@ -71,10 +69,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    qsort(mst, n-1, sizeof(aresta_t *), comparar_arestas_desc); // ordena as arestas da MST pela distancia (decrescente)
+    
+    // qsort(mst, n-1, sizeof(aresta_t *), comparar_arestas_desc); // ordena as arestas da MST pela distancia (decrescente)
 
     ufind_t *uf_clusters = uf_create(n);
-    for (int i = k - 1; i < n - 1; i++) {
+    for (int i = count - (k-1); i >= 0; i--) {
         int u = aresta_get_from(mst[i]);      // AGRUPANDO OS K-1 MENORES
         int v = aresta_get_to(mst[i]);
         uf_union(uf_clusters, u, v);
@@ -129,7 +128,7 @@ int main(int argc, char *argv[]) {
                 clusters_array[idx].ids = realloc(clusters_array[idx].ids, clusters_array[idx].capacidade * sizeof(char *));
             }
 
-            clusters_array[idx].ids[clusters_array[idx].tamanho++] = strdup(ponto_get_id(pontos[i]));
+            clusters_array[idx].ids[clusters_array[idx].tamanho++] = ponto_get_id(pontos[i]);
         }
     }
 

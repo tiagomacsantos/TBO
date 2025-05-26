@@ -13,4 +13,4 @@ def gerar_clusters_artificiais(nome_arquivo, num_clusters=5, pontos_por_cluster=
                 id_counter += 1
     print(f"Arquivo '{nome_arquivo}' gerado com {num_clusters * pontos_por_cluster} pontos.")
 
-gerar_clusters_artificiais("teste.txt", num_clusters=5, pontos_por_cluster=1000, dimensao=2)
+gerar_clusters_artificiais("teste.txt", num_clusters=10, pontos_por_cluster=1500, dimensao=2)
