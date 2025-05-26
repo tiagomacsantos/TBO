@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "ponto.h"
 #include "aresta.h"
 #include "ufind.h"
@@ -33,6 +34,9 @@ int cmp_clusters(const void *a, const void *b) {
 }
 
 int main(int argc, char *argv[]) {
+
+    clock_t start, end;
+    start = clock();
 
     FILE *in = fopen(argv[1], "r");
     FILE *out = fopen(argv[3], "w");
@@ -193,5 +197,9 @@ int main(int argc, char *argv[]) {
 
     fclose(in);
     fclose(out);
+
+    end = clock();
+    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Tempo gasto: %.2f segundos\n", time_spent);
     return 0;
 }
