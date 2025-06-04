@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     // qsort(mst, n-1, sizeof(aresta_t *), comparar_arestas_desc); // ordena as arestas da MST pela distancia (decrescente)
 
     ufind_t *uf_clusters = uf_create(n);
-    for (int i = count - (k-1); i >= 0; i--) {
+    for (int i = count - k; i >= 0; i--) {
         int u = aresta_get_from(mst[i]);      // AGRUPANDO OS K-1 MENORES
         int v = aresta_get_to(mst[i]);
         uf_union(uf_clusters, u, v);
@@ -103,32 +103,36 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // alocando os clusters
-    cluster_t *clusters_array = malloc(num_clusters * sizeof(cluster_t));
-    for(int i = 0; i < num_clusters; i++) {
-        clusters_array[i].ids = malloc(10 * sizeof(char *));
-        clusters_array[i].tamanho = 0;
-        clusters_array[i].capacidade = 10;
-    }
+    // conta quantos pontos tem em cada cluster
+    int *contagem = calloc(num_clusters, sizeof(int));
 
-    // preenchendo os clusters
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         int raiz = clusters[i];
-        int idx = -1;
-        for(int j = 0; j < num_clusters; j++) {
-            if(raizes[j] == raiz) {
-                idx = j;
+        for (int j = 0; j < num_clusters; j++) {
+            if (raizes[j] == raiz) {
+                contagem[j]++;
                 break;
             }
         }
-        // garantir capacidade
-        if (idx != -1) {
-            if (clusters_array[idx].tamanho == clusters_array[idx].capacidade) {
-                clusters_array[idx].capacidade *= 2;
-                clusters_array[idx].ids = realloc(clusters_array[idx].ids, clusters_array[idx].capacidade * sizeof(char *));
-            }
+    }
 
-            clusters_array[idx].ids[clusters_array[idx].tamanho++] = ponto_get_id(pontos[i]);
+    // aloca os clusters com tamanho certo
+    cluster_t *clusters_array = malloc(num_clusters * sizeof(cluster_t));
+    for (int i = 0; i < num_clusters; i++) {
+        clusters_array[i].ids = malloc(contagem[i] * sizeof(char *));
+        clusters_array[i].tamanho = 0;
+        clusters_array[i].capacidade = contagem[i]; 
+    }
+    free(contagem);
+
+    // preenche sem precisar de realloc
+    for (int i = 0; i < n; i++) {
+        int raiz = clusters[i];
+        for (int j = 0; j < num_clusters; j++) {
+            if (raizes[j] == raiz) {
+                clusters_array[j].ids[clusters_array[j].tamanho++] = ponto_get_id(pontos[i]);
+                break;
+            }
         }
     }
 
